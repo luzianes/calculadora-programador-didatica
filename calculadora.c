@@ -1,7 +1,7 @@
 /*
 *Calculadora Programador Didática
 *Autor: Luziane Pires dos Santos
-*Revisões: (24/08/2024 00:24)
+*Revisões: (24/08/2024 00:24) (25/08/2024 07:05)
 */
 
 #include <stdio.h>
@@ -9,6 +9,7 @@
 #include <string.h>
 
 void conversao_base_2 (int dividendo);
+void conversao_base_8 (int dividendo);
 
 int main (){
 
@@ -43,7 +44,11 @@ int main (){
                 
                 break;
             case 2: //Conversão da base 10 para base 8
-            /* code */
+
+                printf ("\nDigite o numero para ser convertido: ");
+                scanf ("%d", &numero);
+
+                conversao_base_8 (numero);
                 break;
             case 3: //Conversão da base 10 para base 16
             /* code */
@@ -97,6 +102,39 @@ void conversao_base_2 (int dividendo){
     for (int i = 0; i < tamanho; i++){
         if (base2[i] != -1){
             printf ("%c", base2[i]);
+        }
+    }
+    printf ("\n");
+    system ("pause");
+   
+};
+
+void conversao_base_8 (int dividendo){
+    int resto = 0; 
+    char base8 [65] = {'\0'};
+    char temp [65] = {'\0'};
+    int indice = 0;
+
+    printf ("\nFormacao dos digitos a partir do resto de sucessivas divisoes por 8: \n\n");
+
+    while (dividendo > 0){
+        
+        resto = dividendo % 8;
+        temp[indice] = resto + '0';
+        indice++;
+        printf ("Divisao de %d por 8 =  %d; Resto = %d\n", dividendo, dividendo/8, resto);
+        dividendo = dividendo/8;
+    }
+    temp[indice + 1] = dividendo + '0';
+
+    for (int i = 0; i < indice; i++){
+        base8[i] = temp[indice - i - 1];
+    }
+    printf("\nResultado da conversao, considerando os restos em ordem inversa: ");
+    int tamanho = sizeof(base8) / sizeof(base8[0]);
+    for (int i = 0; i < tamanho; i++){
+        if (base8[i] != -1){
+            printf ("%c", base8[i]);
         }
     }
     printf ("\n");
