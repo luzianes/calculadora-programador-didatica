@@ -1,16 +1,15 @@
 /*
 *Calculadora Programador Didática
 *Autor: Luziane Pires dos Santos
-*Revisões: (25/08/2024 00:24) (25/08/2024 07:05) (25/08/2024 07:15)
+*Revisões: (25/08/2024 00:24) (25/08/2024 07:05) (25/08/2024 07:15) (25/08/2024 09:07)
 */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-void conversao_base_2 (int dividendo);
-void conversao_base_8 (int dividendo);
-void conversao_base_16 (int dividendo);
+void conversao_base (int dividendo, int base);
+void conversao_bcd (int numeral);
 
 int main (){
 
@@ -21,7 +20,6 @@ int main (){
     while (1){
         printf ("\n\nCALCULADORA PROGRAMADOR DIDATICA\n\n");
         printf ("================================\n\n");
-        printf ("Digite a opcao desejada: \n\n");
         printf ("(1) Converter da base 10 para base 2\n\n");
         printf ("(2) Converter da base 10 para base 8\n\n");
         printf ("(3) Converter da base 10 para base 16\n\n");
@@ -29,7 +27,7 @@ int main (){
         printf ("(5) Converter da base 10 para base 2 com 16 bits (complemento a 2)\n\n");
         printf ("(6) Converter real em decimal para float e double\n\n");
         printf ("(7) Sair\n\n");
-
+        printf ("Digite a opcao desejada: ");
         scanf ("%d", &opcao);
 
         switch (opcao){
@@ -39,7 +37,7 @@ int main (){
                 printf ("\nDigite o numero para ser convertido: ");
                 scanf ("%d", &numero);
 
-                conversao_base_2 (numero);
+                conversao_base (numero, 2);
                 
                 
                 break;
@@ -48,17 +46,20 @@ int main (){
                 printf ("\nDigite o numero para ser convertido: ");
                 scanf ("%d", &numero);
 
-                conversao_base_8 (numero);
+                conversao_base (numero, 8);
                 break;
             case 3: //Conversão da base 10 para base 16
 
                 printf ("\nDigite o numero para ser convertido: ");
                 scanf ("%d", &numero);
 
-                conversao_base_16 (numero);
+                conversao_base (numero, 16);
                 break;
             case 4: //Conversão da base 10 para código BCD
-                /* code */
+                printf ("\nDigite o numero para ser convertido: ");
+                scanf ("%d", &numero);
+
+                conversao_bcd (numero);
                 break;
             case 5: //Conversão da base 10 para base 2 com 16 bits (complemento a 2)
             /* code */
@@ -80,101 +81,41 @@ int main (){
 
 }
 
-void conversao_base_2 (int dividendo){
+void conversao_base (int dividendo, int base){
     int resto = 0; 
-    char base2 [65] = {'\0'};
+    char resultado [65] = {'\0'};
     char temp [65] = {'\0'};
     int indice = 0;
 
-    printf ("\nFormacao dos digitos a partir do resto de sucessivas divisoes por 2: \n\n");
+    printf ("\nFormacao dos digitos a partir do resto de sucessivas divisoes por %d: \n\n", base);
 
     while (dividendo > 0){
         
-        resto = dividendo % 2;
+        resto = dividendo % base;
         temp[indice] = resto + '0';
         indice++;
-        printf ("Divisao de %d por 2 =  %d; Resto = %d\n", dividendo, dividendo/2, resto);
-        dividendo = dividendo/2;
+        printf ("Divisao de %d por %d =  %d; Resto = %d\n", dividendo, base, dividendo/base, resto);
+        dividendo = dividendo/base;
     }
     temp[indice + 1] = dividendo + '0';
 
     for (int i = 0; i < indice; i++){
-        base2[i] = temp[indice - i - 1];
+        resultado[i] = temp[indice - i - 1];
     }
     printf("\nResultado da conversao, considerando os restos em ordem inversa: ");
-    int tamanho = sizeof(base2) / sizeof(base2[0]);
+    int tamanho = sizeof(resultado) / sizeof(resultado[0]);
     for (int i = 0; i < tamanho; i++){
-        if (base2[i] != -1){
-            printf ("%c", base2[i]);
+        if (resultado[i] != -1){
+            printf ("%c", resultado[i]);
         }
     }
-    printf ("\n");
+    printf ("\n\n");
     system ("pause");
    
 };
 
-void conversao_base_8 (int dividendo){
-    int resto = 0; 
-    char base8 [65] = {'\0'};
-    char temp [65] = {'\0'};
-    int indice = 0;
 
-    printf ("\nFormacao dos digitos a partir do resto de sucessivas divisoes por 8: \n\n");
 
-    while (dividendo > 0){
-        
-        resto = dividendo % 8;
-        temp[indice] = resto + '0';
-        indice++;
-        printf ("Divisao de %d por 8 =  %d; Resto = %d\n", dividendo, dividendo/8, resto);
-        dividendo = dividendo/8;
-    }
-    temp[indice + 1] = dividendo + '0';
+void conversao_bcd (int numeral){
 
-    for (int i = 0; i < indice; i++){
-        base8[i] = temp[indice - i - 1];
-    }
-    printf("\nResultado da conversao, considerando os restos em ordem inversa: ");
-    int tamanho = sizeof(base8) / sizeof(base8[0]);
-    for (int i = 0; i < tamanho; i++){
-        if (base8[i] != -1){
-            printf ("%c", base8[i]);
-        }
-    }
-    printf ("\n");
-    system ("pause");
-   
-};
-
-void conversao_base_16 (int dividendo){
-    int resto = 0; 
-    char base16 [65] = {'\0'};
-    char temp [65] = {'\0'};
-    int indice = 0;
-
-    printf ("\nFormacao dos digitos a partir do resto de sucessivas divisoes por 16: \n\n");
-
-    while (dividendo > 0){
-        
-        resto = dividendo % 16;
-        temp[indice] = resto + '0';
-        indice++;
-        printf ("Divisao de %d por 16 =  %d; Resto = %d\n", dividendo, dividendo/16, resto);
-        dividendo = dividendo/16;
-    }
-    temp[indice + 1] = dividendo + '0';
-
-    for (int i = 0; i < indice; i++){
-        base16[i] = temp[indice - i - 1];
-    }
-    printf("\nResultado da conversao, considerando os restos em ordem inversa: ");
-    int tamanho = sizeof(base16) / sizeof(base16[0]);
-    for (int i = 0; i < tamanho; i++){
-        if (base16[i] != -1){
-            printf ("%c", base16[i]);
-        }
-    }
-    printf ("\n");
-    system ("pause");
-   
 };
