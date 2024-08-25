@@ -9,6 +9,7 @@
 *(24/08/2024 07:15): implementação da função de conversão para base 16;
 *(24/08/2024 09:07): unificação das funções de conversão na função conversao_base;
 *(24/08/2024 16:45): implementação da conversão para código BCD;
+*(25/08/2024 00:19): implementação da conversão em complemento a 2;
 */
 
 #include <stdio.h>
@@ -19,6 +20,7 @@
 void conversao_base (int dividendo, int base);
 char* conversao_base_simplificada (int dividendo);
 void conversao_bcd (int dividendo);
+void conversao_complemento2 (int dividendo);
 
 int main (){
 
@@ -68,12 +70,14 @@ int main (){
             case 4: //Conversão da base 10 para código BCD
                 printf ("\nDigite o numero para ser convertido: ");
                 scanf ("%d", &numero);
-
                 conversao_bcd (numero);
                 break;
 
             case 5: //Conversão da base 10 para base 2 com 16 bits (complemento a 2)
             /* code */
+                printf ("\nDigite o numero para ser convertido: ");
+                scanf ("%d", &numero);
+                conversao_complemento2 (numero);
                 break;
             case 6: //Conversão de real em decimal para float e double
             /* code */
@@ -198,3 +202,72 @@ void conversao_bcd(int dividendo) {
     printf("\n\n");
     system("pause");
 };
+
+//Função para conversão de um número em complemento a 2
+void conversao_complemento2 (int dividendo){
+    int resto = 0; 
+    char resultado [17] = {'\0'};
+    char temp [17] = {'\0'};
+    int indice = 0;
+
+    printf ("\nFormacao dos digitos a partir do resto de sucessivas divisoes por %d: \n\n", 2);
+
+    //Sucessivas divisões pela base e extração do resto
+    while (dividendo > 0){
+        
+        resto = dividendo % 2;
+        temp[indice] = resto + '0';
+        indice++;
+        printf ("Divisao de %d por %d =  %d; Resto = %d\n", dividendo, 2, dividendo/2, resto);
+        dividendo = dividendo/2;
+    }
+
+    //Completa os bits restantes com '0' para formar 16 bits
+    while (indice < 17) {
+        temp[indice] = '0';
+        indice++;
+    }
+    //Converte o número em char e armazena no array temp
+    temp[indice + 1] = dividendo + '0';
+
+    for (int i = 0; i < indice; i++){
+        resultado[i] = temp[indice - i - 1];
+    }
+    
+    printf("\nResultado da conversao na base 2 considerando os restos em ordem inversa: ");
+    int tamanho = sizeof(resultado) / sizeof(resultado[0]);
+
+    for (int i = 1; i < tamanho; i++){
+        printf ("%c", resultado[i]);
+        if (i % 4 == 0){
+            printf (" ");
+        }
+    }
+
+    //Cálculo do complemento de 2
+    int encontrou1 = 0;
+    for (int i = 16; i > 0; i--) {
+
+        if (encontrou1) {
+            // Inversão dos bits após o primeiro '1'
+            if (resultado[i] == '0') {
+                resultado[i] = '1';
+            } else {
+                resultado[i] = '0';
+            }
+        } else if (resultado[i] == '1') {
+            encontrou1 = 1; 
+        }
+    }
+    printf ("\n\nResultado da conversao em complemento a 2 (inversao dos bits apos o primeiro 1): ");
+    for (int i = 1; i < tamanho; i++){
+        printf ("%c", resultado[i]);
+        if (i % 4 == 0){
+            printf (" ");
+        }
+    }
+    printf ("\n\n");
+    system ("pause");
+   
+};
+
