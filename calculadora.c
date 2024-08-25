@@ -11,6 +11,7 @@
 *(24/08/2024 16:45): implementação da conversão para código BCD;
 *(25/08/2024 00:19): implementação da conversão em complemento a 2;
 *(25/08/2024 12:46): correção de bugs nas funções conversao_base e conversao_bcd;
+*(25/08/2024 15:33): iniciada a implementação da função de conversão para float e double;
 */
 
 #include <stdio.h>
@@ -22,11 +23,14 @@ void conversao_base (int dividendo, int base);
 char* conversao_base_simplificada (int dividendo);
 void conversao_bcd (int dividendo);
 void conversao_complemento2 (int dividendo);
+void conversao_float_double (double decimal);
+int contar_digitos_fracionarios(double parte_fracionaria);
 
 int main (){
 
     int opcao;
     int numero;
+    double numero_real;
     
 
     while (1){
@@ -81,7 +85,9 @@ int main (){
                 conversao_complemento2 (numero);
                 break;
             case 6: //Conversão de real em decimal para float e double
-            /* code */
+                printf ("\nDigite o numero real para ser convertido em float e double (Ex.: 100.375): ");
+                scanf ("%lf", &numero_real);
+                conversao_float_double (numero_real);              
                 break;
             case 7: //Sair
                 return 0;
@@ -200,6 +206,7 @@ char* conversao_base_simplificada(int dividendo) {
     return resultado;
 };
 
+//Função para converter o número em código BCD
 void conversao_bcd(int dividendo) {
     char resultado[150] = {'\0'};
     char* temp_resultados[10];
@@ -310,5 +317,107 @@ void conversao_complemento2 (int dividendo){
     printf ("\n\n");
     system ("pause");
    
+};
+
+//Função para converter um número decimal em float e double
+void conversao_float_double (double decimal){
+    //Separação da parte inteira da parte fracionária em duas variáveis
+    printf ("\n=============================================================================================");
+    printf ("\nSeparacao da parte inteira da parte fracionaria: ");
+    double parte_fracionaria = modf(decimal, &decimal);
+    int parte_inteira = (int)decimal;
+    printf ("\n---------------------------------------------------------------------------------------------");
+    printf ("\nParte inteira: %d", parte_inteira);
+    printf ("\nParte fracionaria: %g", parte_fracionaria);
+    printf ("\n---------------------------------------------------------------------------------------------");
+    int resto = 0; 
+    char resultado [65] = {'\0'};
+    char temp [65] = {'\0'};
+    int indice = 0;
+
+    //Conversão da parte inteira
+    printf ("\nFormacao dos digitos da parte inteira a partir do resto de sucessivas divisoes por %d", 2);
+    printf ("\n---------------------------------------------------------------------------------------------");
+    if (parte_inteira == 0){
+
+        resto = parte_inteira % 2;
+        printf ("\n# Divisao de %d por %d = %d; Resto = %d.", parte_inteira, 2, parte_inteira/2, resto);
+        printf ("\n---------------------------------------------------------------------------------------------");
+        printf("\nResultado da conversao da parte inteira: %d", parte_inteira/2);
+        printf ("\n===========================================================================================");
+    } else {
+    
+        //Sucessivas divisões pela base e extração do resto
+        while (parte_inteira > 0){
+            
+            resto = parte_inteira % 2;
+            
+            temp[indice] = resto + '0';
+            
+            indice++;
+            printf ("\n# Divisao de %d por %d = %d; Resto = %d", parte_inteira, 2, parte_inteira/2, resto);
+            parte_inteira = parte_inteira/2;
+            
+        }
+        printf ("\n---------------------------------------------------------------------------------------------");
+        //Converte o número em char e armazena no array temp
+        temp[indice + 1] = parte_inteira + '0';
+
+        for (int i = 0; i < indice; i++){
+            resultado[i] = temp[indice - i - 1];
+        }
+        
+        //Impressão da conversão da parte inteira
+        printf("\nResultado da conversao da parte inteira considerando os restos em ordem inversa: ");
+        int tamanho = sizeof(resultado) / sizeof(resultado[0]);
+        for (int i = 0; i < tamanho; i++){
+            if (resultado[i] != -1){
+                printf ("%c", resultado[i]);
+            }
+        }
+
+        //Conversão da parte fracionária
+        int digitos_fracionarios = contar_digitos_fracionarios(parte_fracionaria);
+        printf ("\nquantidade de dígitos %d", digitos_fracionarios);
+        
+        for (int i = 0; i < digitos_fracionarios; i++){
+            parte_fracionaria = parte_fracionaria * 2;
+
+            if (parte_fracionaria > 1.0) {
+                parte_fracionaria = parte_fracionaria - 1;
+                //guarda 1 da parte inteira para formar o resto
+            } else if (parte_fracionaria < 1.0){
+                //guarda 0 a parte inteira para formar o resto
+            }
+        }
+        //FALTAAAAAAAAAAAA --------------------------------------------------
+        //abrir um array temporário para salvar os restos
+        //inverter a ordem do array
+        //formar o número juntando com a parte inteira
+        //normalizar, colocando a vírgula após o primeiro 1 - imprimir bit de sinal
+        //identificar o expoente e imprimir
+        //aplicar o bias no expoente e imprimir
+        //imprimir o número em float e double de acordo com a quantidade de bits
+
+
+        
+        printf ("\n=============================================================================================");
+    }
+    printf ("\n\n");
+    system ("pause");
+
+};
+
+int contar_digitos_fracionarios(double parte_fracionaria) {
+    int contador = 0;
+
+    // Enquanto houver casas decimais após o ponto
+    while (parte_fracionaria != 0.0 && contador < 15) { // Limitando a 15 casas decimais
+        parte_fracionaria *= 10;
+        parte_fracionaria -= (int)parte_fracionaria;  // Remove a parte inteira
+        contador++;
+    }
+
+    return contador;
 };
 
