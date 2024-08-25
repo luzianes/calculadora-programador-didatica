@@ -10,6 +10,7 @@
 *(24/08/2024 09:07): unificação das funções de conversão na função conversao_base;
 *(24/08/2024 16:45): implementação da conversão para código BCD;
 *(25/08/2024 00:19): implementação da conversão em complemento a 2;
+*(25/08/2024 12:46): correção de bugs nas funções conversao_base e conversao_bcd;
 */
 
 #include <stdio.h>
@@ -75,7 +76,7 @@ int main (){
 
             case 5: //Conversão da base 10 para base 2 com 16 bits (complemento a 2)
             /* code */
-                printf ("\nDigite o numero para ser convertido: ");
+                printf ("\nDigite o numero (sem sinal) para ser convertido em binário negativo: ");
                 scanf ("%d", &numero);
                 conversao_complemento2 (numero);
                 break;
@@ -102,31 +103,62 @@ void conversao_base (int dividendo, int base){
     char resultado [65] = {'\0'};
     char temp [65] = {'\0'};
     int indice = 0;
+    printf ("\n====================================================================");
+    printf ("\nFormacao dos digitos a partir do resto de sucessivas divisoes por %d", base);
+    printf ("\n--------------------------------------------------------------------");
+    if (dividendo == 0){
 
-    printf ("\nFormacao dos digitos a partir do resto de sucessivas divisoes por %d: \n\n", base);
-
-    //Sucessivas divisões pela base e extração do resto
-    while (dividendo > 0){
-        
         resto = dividendo % base;
-        temp[indice] = resto + '0';
-        indice++;
-        printf ("Divisao de %d por %d =  %d; Resto = %d\n", dividendo, base, dividendo/base, resto);
-        dividendo = dividendo/base;
-    }
-    //Converte o número em char e armazena no array temp
-    temp[indice + 1] = dividendo + '0';
-
-    for (int i = 0; i < indice; i++){
-        resultado[i] = temp[indice - i - 1];
-    }
+        printf ("\n# Divisao de %d por %d = %d; Resto = %d.", dividendo, base, dividendo/base, resto);
+        printf ("\n--------------------------------------------------------------------");
+        printf("\nResultado da conversao: %d", dividendo/base);
+        printf ("\n====================================================================");
+    } else {
     
-    printf("\nResultado da conversao, considerando os restos em ordem inversa: ");
-    int tamanho = sizeof(resultado) / sizeof(resultado[0]);
-    for (int i = 0; i < tamanho; i++){
-        if (resultado[i] != -1){
-            printf ("%c", resultado[i]);
+        //Sucessivas divisões pela base e extração do resto
+        while (dividendo > 0){
+            
+            resto = dividendo % base;
+            if (base == 16){
+                if (resto == 10){
+                    temp[indice] = 'A';
+                } else if (resto == 11){
+                    temp[indice] = 'B';
+                } else if (resto == 12){
+                    temp[indice] = 'C';
+                } else if (resto == 13){
+                    temp[indice] = 'D';
+                } else if (resto == 14){
+                    temp[indice] = 'E';
+                } else if (resto == 15){
+                    temp[indice] = 'F';
+                } else {
+                temp[indice] = resto + '0';
+                }
+            } else {
+                temp[indice] = resto + '0';
+            }
+            indice++;
+            printf ("\n# Divisao de %d por %d = %d; Resto = %d", dividendo, base, dividendo/base, resto);
+            dividendo = dividendo/base;
+            
         }
+        printf ("\n--------------------------------------------------------------------");
+        //Converte o número em char e armazena no array temp
+        temp[indice + 1] = dividendo + '0';
+
+        for (int i = 0; i < indice; i++){
+            resultado[i] = temp[indice - i - 1];
+        }
+        
+        printf("\nResultado da conversao, considerando os restos em ordem inversa: ");
+        int tamanho = sizeof(resultado) / sizeof(resultado[0]);
+        for (int i = 0; i < tamanho; i++){
+            if (resultado[i] != -1){
+                printf ("%c", resultado[i]);
+            }
+        }
+        printf ("\n====================================================================");
     }
     printf ("\n\n");
     system ("pause");
@@ -175,30 +207,39 @@ void conversao_bcd(int dividendo) {
 
     printf("\nFormacao dos digitos a partir do resto de sucessivas divisoes por 2:\n\n");
 
-    // Separação dos algarismos do número na base 10
-    while (dividendo > 0) {
-        int digito = dividendo % 10;  //Extrai o último algarismo e armazena na variável digito
-        dividendo = dividendo / 10;   //Remove o último dígito do número a ser convertido
+    if (dividendo == 0){
+        printf ("Divisao de %d por 2 =  %d; Resto = %d.", dividendo, dividendo / 2, dividendo % 2);
+        resultado[3] = dividendo / 2 + '0';
+        for (int i = 0; i < 3; i++){
+            resultado [i] = '0';
+        }
+        resultado[4] = '\0';
 
-        //Conversao do dígito em binário através da função conversao_base_simplificada    
-        char* binario = conversao_base_simplificada(digito);
-        printf("Conversao do digito %d: %s\n", digito, binario);
-        if (binario != NULL) {
-            temp_resultados[digitos] = binario;
-            digitos++;
+    } else {
+        // Separação dos algarismos do número na base 10
+        while (dividendo > 0) {
+            int digito = dividendo % 10;  //Extrai o último algarismo e armazena na variável digito
+            dividendo = dividendo / 10;   //Remove o último dígito do número a ser convertido
+
+            //Conversao do dígito em binário através da função conversao_base_simplificada    
+            char* binario = conversao_base_simplificada(digito);
+            printf("Conversao do digito %d: %s\n", digito, binario);
+            if (binario != NULL) {
+                temp_resultados[digitos] = binario;
+                digitos++;
+            }
+        }
+
+        //Concatenação da conversão atual (temp) na string resultado
+        for (int i = digitos - 1; i >= 0; i--) {
+            strcat(resultado, temp_resultados[i]);
+            strcat(resultado, " ");
+            free(temp_resultados[i]); 
         }
     }
-
-    //Concatenação da conversão atual (temp) na string resultado
-    for (int i = digitos - 1; i >= 0; i--) {
-        strcat(resultado, temp_resultados[i]);
-        strcat(resultado, " ");
-        free(temp_resultados[i]); 
-    }
-
-    printf("\nResultado da conversao em codigo BCD de 4 bits, completando os bits vazios com zero (0): ");
-    printf("%s\n", resultado);
-
+        printf("\n\nResultado da conversao em codigo BCD de 4 bits, completando os bits vazios com zero (0): ");
+        printf("%s\n", resultado);
+    
     printf("\n\n");
     system("pause");
 };
@@ -234,7 +275,7 @@ void conversao_complemento2 (int dividendo){
         resultado[i] = temp[indice - i - 1];
     }
     
-    printf("\nResultado da conversao na base 2 considerando os restos em ordem inversa: ");
+    printf("\n\nResultado da conversao na base 2 considerando os restos em ordem inversa: ");
     int tamanho = sizeof(resultado) / sizeof(resultado[0]);
 
     for (int i = 1; i < tamanho; i++){
