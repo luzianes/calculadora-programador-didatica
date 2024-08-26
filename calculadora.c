@@ -11,7 +11,8 @@
 *(24/08/2024 16:45): implementação da conversão para código BCD;
 *(25/08/2024 00:19): implementação da conversão em complemento a 2;
 *(25/08/2024 12:46): correção de bugs nas funções conversao_base e conversao_bcd;
-*(25/08/2024 15:33): iniciada a implementação da função de conversão para float e double;
+*(25/08/2024 15:33): iniciada a implementação da função de conversão para float e double - finalizada a conversão da parte inteira;
+*(25/08/2024 22:12): continuação da implementação da função de conversão para float e double - finalizada a conversão da parte decimal;
 */
 
 #include <stdio.h>
@@ -322,14 +323,14 @@ void conversao_complemento2 (int dividendo){
 //Função para converter um número decimal em float e double
 void conversao_float_double (double decimal){
     //Separação da parte inteira da parte fracionária em duas variáveis
-    printf ("\n=============================================================================================");
+    printf ("\n===========================================================================================================================");
     printf ("\nSeparacao da parte inteira da parte fracionaria: ");
     double parte_fracionaria = modf(decimal, &decimal);
     int parte_inteira = (int)decimal;
-    printf ("\n---------------------------------------------------------------------------------------------");
+    printf ("\n---------------------------------------------------------------------------------------------------------------------------");
     printf ("\nParte inteira: %d", parte_inteira);
     printf ("\nParte fracionaria: %g", parte_fracionaria);
-    printf ("\n---------------------------------------------------------------------------------------------");
+    printf ("\n---------------------------------------------------------------------------------------------------------------------------");
     int resto = 0; 
     char resultado [65] = {'\0'};
     char temp [65] = {'\0'};
@@ -337,14 +338,14 @@ void conversao_float_double (double decimal){
 
     //Conversão da parte inteira
     printf ("\nFormacao dos digitos da parte inteira a partir do resto de sucessivas divisoes por %d", 2);
-    printf ("\n---------------------------------------------------------------------------------------------");
+    printf ("\n---------------------------------------------------------------------------------------------------------------------------");
     if (parte_inteira == 0){
 
         resto = parte_inteira % 2;
         printf ("\n# Divisao de %d por %d = %d; Resto = %d.", parte_inteira, 2, parte_inteira/2, resto);
-        printf ("\n---------------------------------------------------------------------------------------------");
+        printf ("\n---------------------------------------------------------------------------------------------------------------------------");
         printf("\nResultado da conversao da parte inteira: %d", parte_inteira/2);
-        printf ("\n===========================================================================================");
+        printf ("\n===========================================================================================================================");
     } else {
     
         //Sucessivas divisões pela base e extração do resto
@@ -359,10 +360,11 @@ void conversao_float_double (double decimal){
             parte_inteira = parte_inteira/2;
             
         }
-        printf ("\n---------------------------------------------------------------------------------------------");
+        printf ("\n---------------------------------------------------------------------------------------------------------------------------");
         //Converte o número em char e armazena no array temp
         temp[indice + 1] = parte_inteira + '0';
 
+        //Preenche o array resultado com a ordem inversa do array temp
         for (int i = 0; i < indice; i++){
             resultado[i] = temp[indice - i - 1];
         }
@@ -378,21 +380,48 @@ void conversao_float_double (double decimal){
 
         //Conversão da parte fracionária
         int digitos_fracionarios = contar_digitos_fracionarios(parte_fracionaria);
-        printf ("\nquantidade de dígitos %d", digitos_fracionarios);
+        char temp_decimal [65]= {'\0'};
+
+        printf ("\n---------------------------------------------------------------------------------------------------------------------------");
         
-        for (int i = 0; i < digitos_fracionarios; i++){
+        /*for (int i = 0; i < digitos_fracionarios; i++){
             parte_fracionaria = parte_fracionaria * 2;
 
             if (parte_fracionaria > 1.0) {
                 parte_fracionaria = parte_fracionaria - 1;
-                //guarda 1 da parte inteira para formar o resto
+                temp_decimal[i] = 1 + '0';
             } else if (parte_fracionaria < 1.0){
-                //guarda 0 a parte inteira para formar o resto
+                temp_decimal[i] = 0 + '0';            
+            }
+        }*/
+
+       for (int i = 0; i < digitos_fracionarios; i++) {
+        printf ("\n#Multiplicacao de parte_fracionaria %lf por 2 = %lf", parte_fracionaria, parte_fracionaria * 2);
+        parte_fracionaria = parte_fracionaria * 2;
+        
+        if (parte_fracionaria >= 1.0) {
+            temp_decimal[i] = '1';
+            
+            parte_fracionaria = parte_fracionaria - 1.0;
+            printf ("\tSubtracao de 1.0 na parte fracionaria = %lf", parte_fracionaria);
+        } else {
+            temp_decimal[i] = '0';
+        }
+    }
+
+        
+        //Impressão da conversão da parte decimal
+        printf ("\n---------------------------------------------------------------------------------------------");
+        printf("\nResultado da conversao da parte fracionaria considerando os restos na ordem obtida: ");
+        int tamanho_decimal = sizeof(temp_decimal) / sizeof(temp_decimal[0]);
+        for (int i = 0; i < tamanho_decimal; i++){
+            if (temp_decimal[i] != -1){
+                printf ("%c", temp_decimal[i]);
             }
         }
+
+        char decimal_completo [150] = {'\0'};
         //FALTAAAAAAAAAAAA --------------------------------------------------
-        //abrir um array temporário para salvar os restos
-        //inverter a ordem do array
         //formar o número juntando com a parte inteira
         //normalizar, colocando a vírgula após o primeiro 1 - imprimir bit de sinal
         //identificar o expoente e imprimir
@@ -401,7 +430,7 @@ void conversao_float_double (double decimal){
 
 
         
-        printf ("\n=============================================================================================");
+        printf ("\n===========================================================================================================================");
     }
     printf ("\n\n");
     system ("pause");
