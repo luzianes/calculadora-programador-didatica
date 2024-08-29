@@ -15,6 +15,7 @@
 *(25/08/2024 22:12): continuação da implementação da função de conversão para float e double - finalizada a conversão da parte decimal;
 *(29/08/2024 14:26): continuação da implementação da função de conversão para float e double - iniciada a impressão em float e double;
 *(29/08/2024 14:56): correção de bug na conversão em complemento a 2;
+*(29/08/2024 18:42): correção de bugs de impressão;
 */
 
 #include <stdio.h>
@@ -37,23 +38,27 @@ int main (){
     
 
     while (1){
-        printf ("\n\nCALCULADORA PROGRAMADOR DIDATICA\n\n");
-        printf ("================================\n\n");
-        printf ("(1) Converter da base 10 para base 2\n\n");
-        printf ("(2) Converter da base 10 para base 8\n\n");
-        printf ("(3) Converter da base 10 para base 16\n\n");
-        printf ("(4) Converter da base 10 para o codigo BCD\n\n");
-        printf ("(5) Converter da base 10 para base 2 com 16 bits (complemento a 2)\n\n");
-        printf ("(6) Converter real em decimal para float e double\n\n");
-        printf ("(7) Sair\n\n");
-        printf ("Digite a opcao desejada: ");
+        printf ("\n\n===========================================================================================================================");
+        printf ("\n\nCALCULADORA PROGRAMADOR DIDATICA");
+        printf ("\n\n---------------------------------------------------------------------------------------------------------------------------");
+        printf ("\n\n(1) Converter da base 10 para base 2");
+        printf ("\n\n(2) Converter da base 10 para base 8");
+        printf ("\n\n(3) Converter da base 10 para base 16");
+        printf ("\n\n(4) Converter da base 10 para o codigo BCD");
+        printf ("\n\n(5) Converter da base 10 para base 2 com 16 bits (complemento a 2)");
+        printf ("\n\n(6) Converter real em decimal para float e double");
+        printf ("\n\n(7) Sair");
+        printf ("\n\n---------------------------------------------------------------------------------------------------------------------------");
+        printf ("\n\nDigite a opcao desejada: ");
         scanf ("%d", &opcao);
+        printf ("\n---------------------------------------------------------------------------------------------------------------------------");
+        
 
         switch (opcao){
         
             case 1: //Conversão da base 10 para base 2
 
-                printf ("\nDigite o numero para ser convertido: ");
+                printf ("\n\nDigite um numero inteiro positivo para ser convertido para a base 2: ");
                 scanf ("%d", &numero);
 
                 conversao_base (numero, 2);                             
@@ -61,7 +66,7 @@ int main (){
 
             case 2: //Conversão da base 10 para base 8
 
-                printf ("\nDigite o numero para ser convertido: ");
+                printf ("\n\nDigite um numero inteiro positivo para ser convertido para a base 8: ");
                 scanf ("%d", &numero);
 
                 conversao_base (numero, 8);
@@ -69,26 +74,26 @@ int main (){
 
             case 3: //Conversão da base 10 para base 16
 
-                printf ("\nDigite o numero para ser convertido: ");
+                printf ("\n\nDigite um numero inteiro positivo para ser convertido para a base 16: ");
                 scanf ("%d", &numero);
 
                 conversao_base (numero, 16);
                 break;
 
             case 4: //Conversão da base 10 para código BCD
-                printf ("\nDigite o numero para ser convertido: ");
+                printf ("\n\nDigite um numero inteiro positivo para ser convertido para codigo BCD: ");
                 scanf ("%d", &numero);
                 conversao_bcd (numero);
                 break;
 
             case 5: //Conversão da base 10 para base 2 com 16 bits (complemento a 2)
             /* code */
-                printf ("\nDigite o numero (sem sinal) para ser convertido em binário negativo: ");
+                printf ("\n\nDigite um numero inteiro (sem sinal) para ser convertido em complemento a 2 (Ex.: 100): ");
                 scanf ("%d", &numero);
                 conversao_complemento2 (numero);
                 break;
             case 6: //Conversão de real em decimal para float e double
-                printf ("\nDigite o numero real decimal para ser convertido em float e double (Ex.: 100.375): ");
+                printf ("\n\nDigite um numero real decimal para ser convertido em float e double (Ex.: 100.375): ");
                 scanf ("%lf", &numero_real);
                 conversao_float_double (numero_real);              
                 break;
@@ -97,7 +102,7 @@ int main (){
                 break;
         
             default:
-                printf ("Opcao invalida!");
+                printf ("\n\nOpcao invalida!");
                 break;
         }
     }
@@ -112,16 +117,16 @@ void conversao_base (int dividendo, int base){
     char resultado [65] = {'\0'};
     char temp [65] = {'\0'};
     int indice = 0;
-    printf ("\n====================================================================");
+    printf ("\n===========================================================================================================================");
     printf ("\nFormacao dos digitos a partir do resto de sucessivas divisoes por %d", base);
-    printf ("\n--------------------------------------------------------------------");
+    printf ("\n---------------------------------------------------------------------------------------------------------------------------");
     if (dividendo == 0){
 
         resto = dividendo % base;
         printf ("\n# Divisao de %d por %d = %d; Resto = %d", dividendo, base, dividendo/base, resto);
-        printf ("\n--------------------------------------------------------------------");
+        printf ("\n---------------------------------------------------------------------------------------------------------------------------");
         printf("\nResultado da conversao: %d", dividendo/base);
-        printf ("\n====================================================================");
+        printf ("\n===========================================================================================================================");
     } else {
     
         //Sucessivas divisões pela base e extração do resto
@@ -152,7 +157,7 @@ void conversao_base (int dividendo, int base){
             dividendo = dividendo/base;
             
         }
-        printf ("\n--------------------------------------------------------------------");
+        printf ("\n---------------------------------------------------------------------------------------------------------------------------");
         //Converte o número em char e armazena no array temp
         temp[indice + 1] = dividendo + '0';
 
@@ -167,7 +172,7 @@ void conversao_base (int dividendo, int base){
                 printf ("%c", resultado[i]);
             }
         }
-        printf ("\n====================================================================");
+        printf ("\n===========================================================================================================================");
     }
     printf ("\n\n");
     system ("pause");
@@ -215,10 +220,12 @@ void conversao_bcd(int dividendo) {
     char* temp_resultados[10];
     int digitos = 0;
 
-    printf("\nFormacao dos digitos a partir do resto de sucessivas divisoes por 2 (completando os dígitos vazios com zero):\n\n");
+    printf ("\n===========================================================================================================================");
+    printf("\nFormacao dos digitos a partir do resto de sucessivas divisoes por 2 (completando os digitos vazios com zero):");
+    printf ("\n---------------------------------------------------------------------------------------------------------------------------");
 
     if (dividendo == 0){
-        printf ("Divisao de %d por 2 =  %d; Resto = %d", dividendo, dividendo / 2, dividendo % 2);
+        printf ("\nDivisao de %d por 2 =  %d; Resto = %d", dividendo, dividendo / 2, dividendo % 2);
         resultado[3] = dividendo / 2 + '0';
         for (int i = 0; i < 3; i++){
             resultado [i] = '0';
@@ -233,7 +240,7 @@ void conversao_bcd(int dividendo) {
 
             //Conversao do dígito em binário através da função conversao_base_simplificada    
             char* binario = conversao_base_simplificada(digito);
-            printf("Conversao do digito %d: %s\n", digito, binario);
+            printf("\nConversao do digito %d: %s", digito, binario);
             if (binario != NULL) {
                 temp_resultados[digitos] = binario;
                 digitos++;
@@ -247,8 +254,10 @@ void conversao_bcd(int dividendo) {
             free(temp_resultados[i]); 
         }
     }
-        printf("\n\nResultado da conversao em codigo BCD de 4 bits: ");
-        printf("%s\n", resultado);
+        printf ("\n---------------------------------------------------------------------------------------------------------------------------");
+        printf("\nResultado da conversao em codigo BCD de 4 bits: ");
+        printf("%s", resultado);
+        printf ("\n===========================================================================================================================");
     
     printf("\n\n");
     system("pause");
@@ -261,7 +270,10 @@ void conversao_complemento2 (int dividendo){
     char temp [17] = {'\0'};
     int indice = 0;
 
-    printf ("\nFormacao dos digitos a partir do resto de sucessivas divisoes por %d: \n\n", 2);
+    printf ("\n===========================================================================================================================");
+    printf ("\nFormacao dos digitos a partir do resto de sucessivas divisoes por %d:", 2);
+    printf ("\n---------------------------------------------------------------------------------------------------------------------------");
+
 
     //Sucessivas divisões pela base e extração do resto
     while (dividendo > 0){
@@ -269,7 +281,7 @@ void conversao_complemento2 (int dividendo){
         resto = dividendo % 2;
         temp[indice] = resto + '0';
         indice++;
-        printf ("Divisao de %d por %d =  %d; Resto = %d\n", dividendo, 2, dividendo/2, resto);
+        printf ("\nDivisao de %d por %d =  %d; Resto = %d", dividendo, 2, dividendo/2, resto);
         dividendo = dividendo/2;
     }
 
@@ -285,7 +297,9 @@ void conversao_complemento2 (int dividendo){
         resultado[i] = temp[indice - i - 1];
     }
     
-    printf("\n\nResultado da conversao na base 2 considerando os restos em ordem inversa: ");
+    printf ("\n---------------------------------------------------------------------------------------------------------------------------");
+
+    printf("\nResultado da conversao na base 2 considerando os restos em ordem inversa: ");
     int tamanho = sizeof(resultado) / sizeof(resultado[0]);
 
     for (int i = 1; i < tamanho; i++){
@@ -294,8 +308,10 @@ void conversao_complemento2 (int dividendo){
             printf (" ");
         }
     }
+    
+    printf ("\n---------------------------------------------------------------------------------------------------------------------------");
 
-    printf("\n\nInversao dos bits do resultado da conversao na base 2: ");
+    printf("\nInversao dos bits do resultado da conversao na base 2: ");
     for (int i = 1; i < tamanho; i++){
         if (resultado [i] == '0') {
             printf ("1");
@@ -322,16 +338,17 @@ void conversao_complemento2 (int dividendo){
             encontrou1 = 1; 
         }
     }
+    printf ("\nAdicao de 1 bit ao resultado anterior: + 1");
+    printf ("\n---------------------------------------------------------------------------------------------------------------------------");
 
-    
-
-    printf ("\n\nResultado da conversao em complemento a 2 (apos adicao de 1 bit ao resultado anterior): ");
+    printf ("\nResultado da conversao em complemento a 2: ");
     for (int i = 1; i < tamanho; i++){
         printf ("%c", resultado[i]);
         if (i % 4 == 0){
             printf (" ");
         }
     }
+    printf ("\n===========================================================================================================================");
     printf ("\n\n");
     system ("pause");
    
@@ -413,7 +430,7 @@ void conversao_float_double(double decimal) {
     //Normalizando o expoente
     expoente = strlen(resultado) - expoente - 1; // Número de deslocamentos
 
-    printf("\nNumero normalizado: 1.%s ou %s x 10^-%d", mantissa, decimal_completo, expoente);
+    printf("\nNumero normalizado: 1.%s ou %s x 10^%d", mantissa, decimal_completo, expoente);
 
     //Calcular o expoente e aplicar o bias (127 para float)
     expoente += 127;
