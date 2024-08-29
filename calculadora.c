@@ -13,6 +13,7 @@
 *(25/08/2024 12:46): correção de bugs nas funções conversao_base e conversao_bcd;
 *(25/08/2024 15:33): iniciada a implementação da função de conversão para float e double - finalizada a conversão da parte inteira;
 *(25/08/2024 22:12): continuação da implementação da função de conversão para float e double - finalizada a conversão da parte decimal;
+*(29/08/2024 14:26): continuação da implementação da função de conversão para float e double - iniciada a impressão em float e double;
 */
 
 #include <stdio.h>
@@ -320,121 +321,130 @@ void conversao_complemento2 (int dividendo){
    
 };
 
-//Função para converter um número decimal em float e double
-void conversao_float_double (double decimal){
-    //Separação da parte inteira da parte fracionária em duas variáveis
-    printf ("\n===========================================================================================================================");
-    printf ("\nSeparacao da parte inteira da parte fracionaria: ");
+// Função para converter um número decimal em float e double
+void conversao_float_double(double decimal) {
+    // Separação da parte inteira da parte fracionária em duas variáveis
+    printf("\n===========================================================================================================================");
+    printf("\nSeparacao da parte inteira da parte fracionaria: ");
     double parte_fracionaria = modf(decimal, &decimal);
     int parte_inteira = (int)decimal;
-    printf ("\n---------------------------------------------------------------------------------------------------------------------------");
-    printf ("\nParte inteira: %d", parte_inteira);
-    printf ("\nParte fracionaria: %g", parte_fracionaria);
-    printf ("\n---------------------------------------------------------------------------------------------------------------------------");
-    int resto = 0; 
-    char resultado [65] = {'\0'};
-    char temp [65] = {'\0'};
+    printf("\n---------------------------------------------------------------------------------------------------------------------------");
+    printf("\nParte inteira: %d", parte_inteira);
+    printf("\nParte fracionaria: %g", parte_fracionaria);
+    printf("\n---------------------------------------------------------------------------------------------------------------------------");
+    
+    int resto = 0;
+    char resultado[65] = {'\0'};
+    char temp[65] = {'\0'};
     int indice = 0;
 
-    //Conversão da parte inteira
-    printf ("\nFormacao dos digitos da parte inteira a partir do resto de sucessivas divisoes por %d", 2);
-    printf ("\n---------------------------------------------------------------------------------------------------------------------------");
-    if (parte_inteira == 0){
-
-        resto = parte_inteira % 2;
-        printf ("\n# Divisao de %d por %d = %d; Resto = %d.", parte_inteira, 2, parte_inteira/2, resto);
-        printf ("\n---------------------------------------------------------------------------------------------------------------------------");
-        printf("\nResultado da conversao da parte inteira: %d", parte_inteira/2);
-        printf ("\n===========================================================================================================================");
+    // Conversão da parte inteira
+    if (parte_inteira == 0) {
+        printf("\nResultado da conversao da parte inteira: 0");
     } else {
-    
-        //Sucessivas divisões pela base e extração do resto
-        while (parte_inteira > 0){
-            
+        // Sucessivas divisões pela base e extração do resto
+        while (parte_inteira > 0) {
             resto = parte_inteira % 2;
-            
             temp[indice] = resto + '0';
-            
             indice++;
-            printf ("\n# Divisao de %d por %d = %d; Resto = %d", parte_inteira, 2, parte_inteira/2, resto);
-            parte_inteira = parte_inteira/2;
-            
+            parte_inteira = parte_inteira / 2;
         }
-        printf ("\n---------------------------------------------------------------------------------------------------------------------------");
-        //Converte o número em char e armazena no array temp
-        temp[indice + 1] = parte_inteira + '0';
-
-        //Preenche o array resultado com a ordem inversa do array temp
-        for (int i = 0; i < indice; i++){
+        // Preenche o array resultado com a ordem inversa do array temp
+        for (int i = 0; i < indice; i++) {
             resultado[i] = temp[indice - i - 1];
         }
-        
-        //Impressão da conversão da parte inteira
-        printf("\nResultado da conversao da parte inteira considerando os restos em ordem inversa: ");
-        int tamanho = sizeof(resultado) / sizeof(resultado[0]);
-        for (int i = 0; i < tamanho; i++){
-            if (resultado[i] != -1){
-                printf ("%c", resultado[i]);
-            }
-        }
+        printf("\nResultado da conversao da parte inteira: %s", resultado);
+    }
 
-        //Conversão da parte fracionária
-        int digitos_fracionarios = contar_digitos_fracionarios(parte_fracionaria);
-        char temp_decimal [65]= {'\0'};
-
-        printf ("\n---------------------------------------------------------------------------------------------------------------------------");
-        
-        /*for (int i = 0; i < digitos_fracionarios; i++){
-            parte_fracionaria = parte_fracionaria * 2;
-
-            if (parte_fracionaria > 1.0) {
-                parte_fracionaria = parte_fracionaria - 1;
-                temp_decimal[i] = 1 + '0';
-            } else if (parte_fracionaria < 1.0){
-                temp_decimal[i] = 0 + '0';            
-            }
-        }*/
-
-       for (int i = 0; i < digitos_fracionarios; i++) {
-        printf ("\n#Multiplicacao de parte_fracionaria %lf por 2 = %lf", parte_fracionaria, parte_fracionaria * 2);
-        parte_fracionaria = parte_fracionaria * 2;
-        
+    // Conversão da parte fracionária
+    int digitos_fracionarios = contar_digitos_fracionarios(parte_fracionaria);
+    char temp_decimal[65] = {'\0'};
+    for (int i = 0; i < digitos_fracionarios; i++) {
+        parte_fracionaria *= 2;
         if (parte_fracionaria >= 1.0) {
             temp_decimal[i] = '1';
-            
-            parte_fracionaria = parte_fracionaria - 1.0;
-            printf ("\tSubtracao de 1.0 na parte fracionaria = %lf", parte_fracionaria);
+            parte_fracionaria -= 1.0;
         } else {
             temp_decimal[i] = '0';
         }
     }
 
-        
-        //Impressão da conversão da parte decimal
-        printf ("\n---------------------------------------------------------------------------------------------");
-        printf("\nResultado da conversao da parte fracionaria considerando os restos na ordem obtida: ");
-        int tamanho_decimal = sizeof(temp_decimal) / sizeof(temp_decimal[0]);
-        for (int i = 0; i < tamanho_decimal; i++){
-            if (temp_decimal[i] != -1){
-                printf ("%c", temp_decimal[i]);
-            }
+    // Imprimir a parte decimal convertida
+    printf("\nResultado da conversao da parte fracionaria: %s", temp_decimal);
+
+    // Formação do número binário completo
+    char decimal_completo[150] = {'\0'};
+    snprintf(decimal_completo, sizeof(decimal_completo), "%s.%s", resultado, temp_decimal);
+
+    printf("\nNumero binario completo: %s", decimal_completo);
+
+    // Normalização do número
+    int expoente = 0;
+    char mantissa[24] = {'\0'};
+    int mantissa_index = 0;
+    int encontrou_um = 0; // Usado para ignorar o primeiro '1'
+    
+    // Encontrar o índice do primeiro '1' e normalizar
+    for (int i = 0; decimal_completo[i] != '\0'; i++) {
+        if (decimal_completo[i] == '1' && !encontrou_um) {
+            expoente = i; // Índice do primeiro '1'
+            encontrou_um = 1;
+        } else if (encontrou_um && mantissa_index < 23 && decimal_completo[i] != '.') {
+            mantissa[mantissa_index++] = decimal_completo[i];
         }
-
-        char decimal_completo [150] = {'\0'};
-        //FALTAAAAAAAAAAAA --------------------------------------------------
-        //formar o número juntando com a parte inteira
-        //normalizar, colocando a vírgula após o primeiro 1 - imprimir bit de sinal
-        //identificar o expoente e imprimir
-        //aplicar o bias no expoente e imprimir
-        //imprimir o número em float e double de acordo com a quantidade de bits
-
-
-        
-        printf ("\n===========================================================================================================================");
     }
-    printf ("\n\n");
-    system ("pause");
 
+    // Normalizando o expoente
+    expoente = strlen(resultado) - expoente - 1; // Número de deslocamentos
+
+    printf("\nNumero normalizado: 1.%s", mantissa);
+
+    // Calcular o expoente e aplicar o bias (127 para float)
+    expoente += 127;
+
+    // Imprimir o número em linha única (sinal, expoente, mantissa)
+    printf("\nNumero em linha unica (float): 0 ");  // Sinal = 0 para números positivos
+    for (int i = 7; i >= 0; i--) {
+        printf("%d", (expoente >> i) & 1);
+    }
+    printf(" %s", mantissa);
+
+    // Formato float (32 bits)
+    printf("\n---------------------------------------------------------------------------------------------");
+    printf("\nNumero em formato float (32 bits):");
+    printf("\nSinal: 0");
+    printf("\nExpoente: ");
+    for (int i = 7; i >= 0; i--) {
+        printf("%d", (expoente >> i) & 1);
+    }
+    printf("\nMantissa: ");
+    for (int i = 0; i < 23; i++) {
+        if (i < strlen(mantissa)) {
+            printf("%c", mantissa[i]);
+        } else {
+            printf("0");
+        }
+    }
+
+    // Formato double (64 bits)
+    expoente += (1023 - 127);  // Ajuste para o bias 1023 do double
+    printf("\n---------------------------------------------------------------------------------------------");
+    printf("\nNumero em formato double (64 bits):");
+    printf("\nSinal: 0");
+    printf("\nExpoente: ");
+    for (int i = 10; i >= 0; i--) {
+        printf("%d", (expoente >> i) & 1);
+    }
+    printf("\nMantissa: ");
+    for (int i = 0; i < 52; i++) {
+        if (i < strlen(mantissa)) {
+            printf("%c", mantissa[i]);
+        } else {
+            printf("0");
+        }
+    }
+
+    printf("\n===========================================================================================================================\n");
 };
 
 int contar_digitos_fracionarios(double parte_fracionaria) {
