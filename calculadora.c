@@ -16,6 +16,7 @@
 *(29/08/2024 14:26): continuação da implementação da função de conversão para float e double - iniciada a impressão em float e double;
 *(29/08/2024 14:56): correção de bug na conversão em complemento a 2;
 *(29/08/2024 18:42): correção de bugs de impressão;
+*(30/08/2024 13:52): correção de bug na conversão para complemento a 2, que passa a aceitar o número com sinal negativo (-);
 */
 
 #include <stdio.h>
@@ -88,9 +89,9 @@ int main (){
 
             case 5: //Conversão da base 10 para base 2 com 16 bits (complemento a 2)
             /* code */
-                printf ("\n\nDigite um numero inteiro (sem sinal) para ser convertido em complemento a 2 (Ex.: 100): ");
+                printf ("\n\nDigite um numero inteiro negativo para ser convertido em complemento a 2 (Ex.: -100): ");
                 scanf ("%d", &numero);
-                conversao_complemento2 (numero);
+                conversao_complemento2 (abs(numero));
                 break;
             case 6: //Conversão de real em decimal para float e double
                 printf ("\n\nDigite um numero real decimal para ser convertido em float e double (Ex.: 100.375): ");
@@ -433,24 +434,17 @@ void conversao_float_double(double decimal) {
     printf("\nNumero normalizado: 1.%s ou %s x 10^%d", mantissa, decimal_completo, expoente);
 
     //Calcular o expoente e aplicar o bias (127 para float)
-    expoente += 127;
-
-    //Imprimir o número em linha única (sinal, expoente, mantissa)
-    printf("\nNumero em linha unica (float): 0 ");  //Sinal = 0 para números positivos
-    for (int i = 7; i >= 0; i--) {
-        printf("%d", (expoente >> i) & 1);
-    }
-    printf(" %s", mantissa);
+    expoente = expoente + 127;
 
     //Formato float (32 bits)
     printf("\n---------------------------------------------------------------------------------------------------------------------------");
-    printf("\nNumero em formato float (32 bits), sendo 1 bit de sinal, 8 bits de expoente e 23 bits de significando:");
+    printf("\nNumero em formato float (32 bits), sendo 1 bit de sinal, 8 bits de expoente e 23 bits de fracao:");
     printf("\nSinal: 0");
     printf("\nExpoente: ");
     for (int i = 7; i >= 0; i--) {
         printf("%d", (expoente >> i) & 1);
     }
-    printf("\nMantissa: ");
+    printf("\nFracao: ");
     for (int i = 0; i < 23; i++) {
         if (i < strlen(mantissa)) {
             printf("%c", mantissa[i]);
@@ -459,16 +453,19 @@ void conversao_float_double(double decimal) {
         }
     }
 
+    //Impressão do número em linha única
+
+
     //Formato double (64 bits)
-    expoente += (1023 - 127);  //Inclusão do bias 1023
+    expoente = expoente + (1023 - 127);  //Inclusão do bias 1023 (- 127 que tinha sido incluído para calcular o float)
     printf("\n---------------------------------------------------------------------------------------------------------------------------");
-    printf("\nNumero em formato double (64 bits), sendo 1 bit de sinal, 11 bits de expoente e 52 bits de significando:");
+    printf("\nNumero em formato double (64 bits), sendo 1 bit de sinal, 11 bits de expoente e 52 bits de fracao:");
     printf("\nSinal: 0");
     printf("\nExpoente: ");
     for (int i = 10; i >= 0; i--) {
         printf("%d", (expoente >> i) & 1);
     }
-    printf("\nMantissa: ");
+    printf("\nFracao: ");
     for (int i = 0; i < 52; i++) {
         if (i < strlen(mantissa)) {
             printf("%c", mantissa[i]);
