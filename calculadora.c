@@ -17,6 +17,7 @@
 *(29/08/2024 14:56): correção de bug na conversão em complemento a 2;
 *(29/08/2024 18:42): correção de bugs de impressão;
 *(30/08/2024 13:52): correção de bug na conversão para complemento a 2, que passa a aceitar o número com sinal negativo (-);
+*(30/08/2024 15:55): correção de bugs na função para conversão em float e double, que passa a aceitar o número com sinal negativo (-);
 */
 
 #include <stdio.h>
@@ -82,20 +83,25 @@ int main (){
                 break;
 
             case 4: //Conversão da base 10 para código BCD
+                
                 printf ("\n\nDigite um numero inteiro positivo para ser convertido para codigo BCD: ");
                 scanf ("%d", &numero);
+                
                 conversao_bcd (numero);
                 break;
 
             case 5: //Conversão da base 10 para base 2 com 16 bits (complemento a 2)
-            /* code */
+            
                 printf ("\n\nDigite um numero inteiro negativo para ser convertido em complemento a 2 (Ex.: -100): ");
                 scanf ("%d", &numero);
+                
                 conversao_complemento2 (abs(numero));
                 break;
             case 6: //Conversão de real em decimal para float e double
+                
                 printf ("\n\nDigite um numero real decimal para ser convertido em float e double (Ex.: 100.375): ");
                 scanf ("%lf", &numero_real);
+                
                 conversao_float_double (numero_real);              
                 break;
             case 7: //Sair
@@ -176,11 +182,11 @@ void conversao_base (int dividendo, int base){
         printf ("\n===========================================================================================================================");
     }
     printf ("\n\n");
-    system ("pause");
+    
    
 };
 
-//Função para converter 1 algarismo para a base 2, sem impressão
+//Função para converter um algarismo para a base 2, sem impressão
 char* conversao_base_simplificada(int dividendo) {
     int resto = 0;
     char temp[5] = {'\0'};  
@@ -265,99 +271,96 @@ void conversao_bcd(int dividendo) {
 };
 
 //Função para conversão de um número em complemento a 2
-void conversao_complemento2 (int dividendo){
+void conversao_complemento2(int dividendo) {
     int resto = 0; 
-    char resultado [17] = {'\0'};
-    char temp [17] = {'\0'};
+    char resultado[17] = {'\0'};
     int indice = 0;
 
-    printf ("\n===========================================================================================================================");
-    printf ("\nFormacao dos digitos a partir do resto de sucessivas divisoes por %d:", 2);
-    printf ("\n---------------------------------------------------------------------------------------------------------------------------");
+    printf("\n===========================================================================================================================");
+    printf("\nFormacao dos digitos a partir do resto de sucessivas divisoes por 2:");
+    printf("\n---------------------------------------------------------------------------------------------------------------------------");
 
-
-    //Sucessivas divisões pela base e extração do resto
-    while (dividendo > 0){
-        
+    // Sucessivas divisões pela base e extração do resto
+    while (dividendo > 0) {
         resto = dividendo % 2;
-        temp[indice] = resto + '0';
-        indice++;
-        printf ("\nDivisao de %d por %d =  %d; Resto = %d", dividendo, 2, dividendo/2, resto);
-        dividendo = dividendo/2;
-    }
-
-    //Completa os bits restantes com '0' para formar 16 bits
-    while (indice < 17) {
-        temp[indice] = '0';
+        resultado[indice] = resto + '0';
+        printf("\nDivisao de %d por 2 =  %d; Resto = %d", dividendo, dividendo / 2, resto);
+        dividendo = dividendo / 2;
         indice++;
     }
-    //Converte o número em char e armazena no array temp
-    temp[indice + 1] = dividendo + '0';
 
-    for (int i = 0; i < indice; i++){
-        resultado[i] = temp[indice - i - 1];
+    // Completar com 0s até 16 bits
+    while (indice < 16) {
+        resultado[indice] = '0';
+        indice++;
     }
-    
-    printf ("\n---------------------------------------------------------------------------------------------------------------------------");
 
+    // Inversão da string para ficar na ordem correta
+    for (int i = 0; i < indice / 2; i++) {
+        char temp = resultado[i];
+        resultado[i] = resultado[indice - i - 1];
+        resultado[indice - i - 1] = temp;
+    }
+
+    printf("\n---------------------------------------------------------------------------------------------------------------------------");
     printf("\nResultado da conversao na base 2 considerando os restos em ordem inversa: ");
-    int tamanho = sizeof(resultado) / sizeof(resultado[0]);
-
-    for (int i = 1; i < tamanho; i++){
-        printf ("%c", resultado[i]);
-        if (i % 4 == 0){
-            printf (" ");
+    for (int i = 0; i < indice; i++) {
+        printf("%c", resultado[i]);
+        if ((i + 1) % 4 == 0 && i != indice - 1) {
+            printf(" ");
         }
     }
-    
-    printf ("\n---------------------------------------------------------------------------------------------------------------------------");
 
+    // Inversão dos bits
+    printf("\n---------------------------------------------------------------------------------------------------------------------------");
     printf("\nInversao dos bits do resultado da conversao na base 2: ");
-    for (int i = 1; i < tamanho; i++){
-        if (resultado [i] == '0') {
-            printf ("1");
-        } else if (resultado[i] == '1'){
-            printf ("0");
+    for (int i = 0; i < 16; i++) {
+        if (resultado[i] == '0') {
+            printf("1");
+        } else {
+            printf("0");
         }
-        if (i % 4 == 0){
-            printf (" ");
+        if ((i + 1) % 4 == 0 && i != 15) {
+            printf(" ");
         }
     }
 
-    //Cálculo do complemento de 2
+    // Cálculo do complemento de 2
     int encontrou1 = 0;
-    for (int i = 16; i > 0; i--) {
-
+    for (int i = 15; i >= 0; i--) {
         if (encontrou1) {
-            //Inversão dos bits após o primeiro '1'
+            // Inversão dos bits após o primeiro '1'
             if (resultado[i] == '0') {
                 resultado[i] = '1';
             } else {
                 resultado[i] = '0';
             }
         } else if (resultado[i] == '1') {
-            encontrou1 = 1; 
+            encontrou1 = 1;
         }
     }
-    printf ("\nAdicao de 1 bit ao resultado anterior: + 1");
-    printf ("\n---------------------------------------------------------------------------------------------------------------------------");
+    
+    printf("\nAdicao de 1 bit ao resultado anterior: + 1");
+    printf("\n---------------------------------------------------------------------------------------------------------------------------");
 
-    printf ("\nResultado da conversao em complemento a 2: ");
-    for (int i = 1; i < tamanho; i++){
-        printf ("%c", resultado[i]);
-        if (i % 4 == 0){
-            printf (" ");
+    printf("\nResultado da conversao em complemento a 2: ");
+    for (int i = 0; i < 16; i++) {
+        printf("%c", resultado[i]);
+        if ((i + 1) % 4 == 0 && i != 15) {
+            printf(" ");
         }
     }
-    printf ("\n===========================================================================================================================");
-    printf ("\n\n");
-    system ("pause");
-   
+    printf("\n===========================================================================================================================\n");
 };
 
 //Função para converter um número decimal em float e double
 void conversao_float_double(double decimal) {
-    //Separação da parte inteira da parte fracionária em duas variáveis
+    int sinal = 0;
+    if (decimal < 0) {
+        sinal = 1;  //Se o número for negativo, sinal = 1
+        decimal = fabs(decimal);  //Considera o valor sem o sinal
+    }
+
     printf("\n===========================================================================================================================");
     printf("\nSeparacao da parte inteira da parte fracionaria: ");
     double parte_fracionaria = modf(decimal, &decimal);
@@ -366,31 +369,46 @@ void conversao_float_double(double decimal) {
     printf("\nParte inteira: %d", parte_inteira);
     printf("\nParte fracionaria: %g", parte_fracionaria);
     printf("\n---------------------------------------------------------------------------------------------------------------------------");
-    
+
     int resto = 0;
     char resultado[65] = {'\0'};
     char temp[65] = {'\0'};
     int indice = 0;
 
-    //Conversão da parte inteira
+    // Conversão da parte inteira
     if (parte_inteira == 0) {
         printf("\nResultado da conversao da parte inteira: 0");
     } else {
-        //Sucessivas divisões pela base e extração do resto
+        // Sucessivas divisões pela base e extração do resto
         while (parte_inteira > 0) {
             resto = parte_inteira % 2;
             temp[indice] = resto + '0';
             indice++;
             parte_inteira = parte_inteira / 2;
         }
-        //Preenche o array resultado com a ordem inversa do array temp
         for (int i = 0; i < indice; i++) {
             resultado[i] = temp[indice - i - 1];
+        }
+
+        // Se o número for negativo, converte a parte inteira para complemento a 2
+        if (sinal == 1) {
+            int encontrou1 = 0;
+            for (int i = indice - 1; i >= 0; i--) {
+                if (encontrou1) {
+                    if (resultado[i] == '0') {
+                        resultado[i] = '1';
+                    } else {
+                        resultado[i] = '0';
+                    }
+                } else if (resultado[i] == '1') {
+                    encontrou1 = 1;
+                }
+            }
         }
         printf("\nResultado da conversao da parte inteira: %s", resultado);
     }
 
-    //Conversão da parte fracionária
+    // Conversão da parte fracionária
     int digitos_fracionarios = contar_digitos_fracionarios(parte_fracionaria);
     char temp_decimal[65] = {'\0'};
     for (int i = 0; i < digitos_fracionarios; i++) {
@@ -403,10 +421,10 @@ void conversao_float_double(double decimal) {
         }
     }
 
-    //Imprimir a parte decimal convertida
+    // Imprimir a parte decimal convertida
     printf("\nResultado da conversao da parte fracionaria: %s", temp_decimal);
 
-    //Formação do número binário completo
+    // Formação do número binário completo
     char decimal_completo[150] = {'\0'};
     snprintf(decimal_completo, sizeof(decimal_completo), "%s.%s", resultado, temp_decimal);
 
@@ -417,8 +435,8 @@ void conversao_float_double(double decimal) {
     char mantissa[24] = {'\0'};
     int mantissa_index = 0;
     int encontrou_um = 0; //Ignora o primeiro '1'
-    
-    //Encontrar o índice do primeiro '1' e normalizar
+
+    //Procura o índice do primeiro '1' e normaliza
     for (int i = 0; decimal_completo[i] != '\0'; i++) {
         if (decimal_completo[i] == '1' && !encontrou_um) {
             expoente = i; //Índice do primeiro '1'
@@ -429,9 +447,9 @@ void conversao_float_double(double decimal) {
     }
 
     //Normalizando o expoente
-    expoente = strlen(resultado) - expoente - 1; // Número de deslocamentos
+    expoente = strlen(resultado) - expoente - 1; //Salva o número de deslocamentos
 
-    printf("\nNumero normalizado: 1.%s ou %s x 10^%d", mantissa, decimal_completo, expoente);
+    printf("\nNumero normalizado: 1.%s x 10^%d", mantissa, expoente);
 
     //Calcular o expoente e aplicar o bias (127 para float)
     expoente = expoente + 127;
@@ -439,10 +457,13 @@ void conversao_float_double(double decimal) {
     //Formato float (32 bits)
     printf("\n---------------------------------------------------------------------------------------------------------------------------");
     printf("\nNumero em formato float (32 bits), sendo 1 bit de sinal, 8 bits de expoente e 23 bits de fracao:");
-    printf("\nSinal: 0");
+    printf("\nSinal: %d", sinal);
     printf("\nExpoente: ");
     for (int i = 7; i >= 0; i--) {
         printf("%d", (expoente >> i) & 1);
+        if (i % 4 == 0){
+            printf (" ");
+        }
     }
     printf("\nFracao: ");
     for (int i = 0; i < 23; i++) {
@@ -451,26 +472,33 @@ void conversao_float_double(double decimal) {
         } else {
             printf("0");
         }
+        if (i % 4 == 0){
+            printf (" ");
+        }
     }
 
-    //Impressão do número em linha única
-
-
     //Formato double (64 bits)
-    expoente = expoente + (1023 - 127);  //Inclusão do bias 1023 (- 127 que tinha sido incluído para calcular o float)
+    expoente = expoente + (1023 - 127);  // Inclusão do bias 1023 (- 127 que tinha sido incluído para calcular o float)
     printf("\n---------------------------------------------------------------------------------------------------------------------------");
     printf("\nNumero em formato double (64 bits), sendo 1 bit de sinal, 11 bits de expoente e 52 bits de fracao:");
-    printf("\nSinal: 0");
+    printf("\nSinal: %d", sinal);
     printf("\nExpoente: ");
     for (int i = 10; i >= 0; i--) {
         printf("%d", (expoente >> i) & 1);
+        if (i % 4 == 0){
+            printf (" ");
+        }
     }
     printf("\nFracao: ");
     for (int i = 0; i < 52; i++) {
         if (i < strlen(mantissa)) {
             printf("%c", mantissa[i]);
+            
         } else {
             printf("0");
+        }
+        if (i % 4 == 0){
+            printf (" ");
         }
     }
 
@@ -489,4 +517,3 @@ int contar_digitos_fracionarios(double parte_fracionaria) {
 
     return contador;
 };
-
