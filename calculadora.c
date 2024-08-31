@@ -19,6 +19,7 @@
 *(30/08/2024 13:52): correção de bug na conversão para complemento a 2, que passa a aceitar o número com sinal negativo (-);
 *(30/08/2024 15:55): correção de bugs na função para conversão em float e double, que passa a aceitar o número com sinal negativo (-);
 *(30/08/2024 21:07): correção de bugs na função para conversão em float e double;
+*(30/08/2024 21:44): ajustes na impressao em float e double.
 */
 
 #include <stdio.h>
@@ -468,6 +469,7 @@ void conversao_float_double(double decimal) {
     printf("\nSinal: %d", sinal);
     
     printf("\nExpoente: ");
+    //Impressão dos bits da variável expoente
     for (int i = 7; i >= 0; i--) {
         printf("%d", (expoente >> i) & 1);
         
@@ -490,6 +492,8 @@ void conversao_float_double(double decimal) {
     printf("\nSinal: %d", sinal);
     printf("\nExpoente com vies: %d", expoente);
     printf("\nExpoente: ");
+
+    //Impressão dos bits da variável expoente
     for (int i = 10; i >= 0; i--) {
         printf("%d", (expoente >> i) & 1);
     }
