@@ -18,6 +18,7 @@
 *(29/08/2024 18:42): correção de bugs de impressão;
 *(30/08/2024 13:52): correção de bug na conversão para complemento a 2, que passa a aceitar o número com sinal negativo (-);
 *(30/08/2024 15:55): correção de bugs na função para conversão em float e double, que passa a aceitar o número com sinal negativo (-);
+*(30/08/2024 21:07): correção de bugs na função para conversão em float e double;
 */
 
 #include <stdio.h>
@@ -140,6 +141,7 @@ void conversao_base (int dividendo, int base){
         while (dividendo > 0){
             
             resto = dividendo % base;
+            //Verificação se a base é 16 para adicionar a letra, se for o caso
             if (base == 16){
                 if (resto == 10){
                     temp[indice] = 'A';
@@ -168,6 +170,7 @@ void conversao_base (int dividendo, int base){
         //Converte o número em char e armazena no array temp
         temp[indice + 1] = dividendo + '0';
 
+        //Passagem do array temp para o array resultado na ordem inversa
         for (int i = 0; i < indice; i++){
             resultado[i] = temp[indice - i - 1];
         }
@@ -186,7 +189,7 @@ void conversao_base (int dividendo, int base){
    
 };
 
-//Função para converter um algarismo para a base 2, sem impressão
+//Função para converter um algarismo para a base 2, sem impressão - usada para formar o código BCD
 char* conversao_base_simplificada(int dividendo) {
     int resto = 0;
     char temp[5] = {'\0'};  
@@ -267,7 +270,7 @@ void conversao_bcd(int dividendo) {
         printf ("\n===========================================================================================================================");
     
     printf("\n\n");
-    system("pause");
+    
 };
 
 //Função para conversão de um número em complemento a 2
@@ -320,7 +323,7 @@ void conversao_complemento2(int dividendo) {
         } else {
             printf("0");
         }
-        if ((i + 1) % 4 == 0 && i != 15) {
+        if ((i + 1) % 4 == 0 && i != 33) {
             printf(" ");
         }
     }
@@ -357,8 +360,8 @@ void conversao_complemento2(int dividendo) {
 void conversao_float_double(double decimal) {
     int sinal = 0;
     if (decimal < 0) {
-        sinal = 1;  //Se o número for negativo, sinal = 1
-        decimal = fabs(decimal);  //Considera o valor sem o sinal
+        sinal = 1;  // Se o número for negativo, sinal = 1
+        decimal = fabs(decimal);  // Considera o valor sem o sinal
     }
 
     printf("\n===========================================================================================================================");
@@ -430,41 +433,46 @@ void conversao_float_double(double decimal) {
 
     printf("\nNumero binario completo: %s", decimal_completo);
 
-    //Normalização do número
+    // Normalização do número
     int expoente = 0;
     char mantissa[24] = {'\0'};
     int mantissa_index = 0;
-    int encontrou_um = 0; //Ignora o primeiro '1'
+    int encontrou_um = 0; // Ignora o primeiro '1'
 
-    //Procura o índice do primeiro '1' e normaliza
+    // Procura o índice do primeiro '1' e normaliza
     for (int i = 0; decimal_completo[i] != '\0'; i++) {
         if (decimal_completo[i] == '1' && !encontrou_um) {
-            expoente = i; //Índice do primeiro '1'
+            expoente = i; // Índice do primeiro '1'
             encontrou_um = 1;
         } else if (encontrou_um && mantissa_index < 23 && decimal_completo[i] != '.') {
             mantissa[mantissa_index++] = decimal_completo[i];
         }
     }
 
-    //Normalizando o expoente
-    expoente = strlen(resultado) - expoente - 1; //Salva o número de deslocamentos
+    // Normalizando o expoente
+    if (strlen(resultado) > 0) {
+        expoente = (int)strlen(resultado) - expoente - 1;
+    } else {
+        expoente = -expoente;
+    }
 
     printf("\nNumero normalizado: 1.%s x 10^%d", mantissa, expoente);
 
-    //Calcular o expoente e aplicar o bias (127 para float)
+    // Calcular o expoente e aplicar o bias (127 para float)
     expoente = expoente + 127;
 
-    //Formato float (32 bits)
+    // Formato float (32 bits)
     printf("\n---------------------------------------------------------------------------------------------------------------------------");
     printf("\nNumero em formato float (32 bits), sendo 1 bit de sinal, 8 bits de expoente e 23 bits de fracao:");
+    printf("\nExpoente com vies: %d", expoente);
     printf("\nSinal: %d", sinal);
+    
     printf("\nExpoente: ");
     for (int i = 7; i >= 0; i--) {
         printf("%d", (expoente >> i) & 1);
-        if (i % 4 == 0){
-            printf (" ");
-        }
+        
     }
+    
     printf("\nFracao: ");
     for (int i = 0; i < 23; i++) {
         if (i < strlen(mantissa)) {
@@ -472,33 +480,26 @@ void conversao_float_double(double decimal) {
         } else {
             printf("0");
         }
-        if (i % 4 == 0){
-            printf (" ");
-        }
+        
     }
 
-    //Formato double (64 bits)
+    // Formato double (64 bits)
     expoente = expoente + (1023 - 127);  // Inclusão do bias 1023 (- 127 que tinha sido incluído para calcular o float)
     printf("\n---------------------------------------------------------------------------------------------------------------------------");
     printf("\nNumero em formato double (64 bits), sendo 1 bit de sinal, 11 bits de expoente e 52 bits de fracao:");
     printf("\nSinal: %d", sinal);
+    printf("\nExpoente com vies: %d", expoente);
     printf("\nExpoente: ");
     for (int i = 10; i >= 0; i--) {
         printf("%d", (expoente >> i) & 1);
-        if (i % 4 == 0){
-            printf (" ");
-        }
     }
+    
     printf("\nFracao: ");
     for (int i = 0; i < 52; i++) {
         if (i < strlen(mantissa)) {
             printf("%c", mantissa[i]);
-            
         } else {
             printf("0");
-        }
-        if (i % 4 == 0){
-            printf (" ");
         }
     }
 
@@ -508,10 +509,10 @@ void conversao_float_double(double decimal) {
 int contar_digitos_fracionarios(double parte_fracionaria) {
     int contador = 0;
 
-    //Enquanto houver casas decimais após o ponto
-    while (parte_fracionaria != 0.0 && contador < 15) { //Até o limite de 15 casas decimais
+    // Enquanto houver casas decimais após o ponto
+    while (parte_fracionaria != 0.0 && contador < 15) { // Até o limite de 15 casas decimais
         parte_fracionaria *= 10;
-        parte_fracionaria -= (int)parte_fracionaria;  //Remove a parte inteira
+        parte_fracionaria -= (int)parte_fracionaria;  // Remove a parte inteira
         contador++;
     }
 
